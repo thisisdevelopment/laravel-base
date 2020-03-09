@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ -f ".env" ]; then
+  exit 0;
+fi
+
+service=$(basename $(pwd))
+project=$(basename $(dirname $(pwd)))
+domain=${service}.${project}.docker
+
+cat > .env <<EOF
+COMPOSE_PROJECT_NAME=${project}_${service}
+
+APP_NAME="${project} -- ${service}"
+APP_DOMAIN=${domain}
+EOF
+
+cat .env.example >> .env
+
+echo "/**********************************************************************"
+echo " * Your new laravel application is now configured an and available."
+echo " * The urls to reach the services on your local machine are:"
+echo " * - your application: http://${domain}"
+echo " * - database server: db.${domain}"
+echo " * - redis server: redis.${domain}"
+echo " * - mail catcher: http://mail.${domain}"
+echo " **********************************************************************"

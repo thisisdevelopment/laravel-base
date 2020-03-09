@@ -1,0 +1,41 @@
+version: '3.1'
+
+networks:
+  default:
+    driver: bridge
+
+services:
+  app:
+    hostname: $APP_DOMAIN
+    build:
+      context: ./docker/app
+    volumes:
+      - .:/var/www:rw
+      - ~/.config/composer/:/home/docker/.composer:rw
+    depends_on:
+      - redis
+      - db
+      - mail
+
+  db:
+    hostname: db.$APP_DOMAIN
+    build:
+      context: ./docker/database
+    volumes:
+      - ./docker/volumes/db:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: $DB_DATABASE
+      MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+
+  redis:
+    image: redis
+    hostname: redis.$APP_DOMAIN
+
+  mail:
+    image: mailhog/mailhog:latest
+    hostname: mail.$APP_DOMAIN
+    sysctls:
+      net.ipv4.ip_unprivileged_port_start: 0
+    environment:
+      MH_API_BIND_ADDR: 0.0.0.0:80
+      MH_UI_BIND_ADDR: 0.0.0.0:80
