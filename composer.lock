@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "56d862ab9ce8dbba6af6bb5f3a1596db",
+    "content-hash": "1952294c6415497cc1e2ee562a6bf40b",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -6936,16 +6936,16 @@
         },
         {
             "name": "thisisdevelopment/laravel-base-dev",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thisisdevelopment/laravel-base-dev.git",
-                "reference": "fed6984381c712b120c260ba2821407e0925176a"
+                "reference": "34f008d817fc429574962e7fcf5708af80c2c6a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thisisdevelopment/laravel-base-dev/zipball/fed6984381c712b120c260ba2821407e0925176a",
-                "reference": "fed6984381c712b120c260ba2821407e0925176a",
+                "url": "https://api.github.com/repos/thisisdevelopment/laravel-base-dev/zipball/34f008d817fc429574962e7fcf5708af80c2c6a3",
+                "reference": "34f008d817fc429574962e7fcf5708af80c2c6a3",
                 "shasum": ""
             },
             "require": {
@@ -6975,7 +6975,7 @@
                 "dev",
                 "laravel"
             ],
-            "time": "2020-03-09T09:36:35+00:00"
+            "time": "2020-03-09T15:04:11+00:00"
         },
         {
             "name": "thisisdevelopment/laravel-test-snapshot",

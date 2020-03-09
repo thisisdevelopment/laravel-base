@@ -11,7 +11,7 @@ services:
       context: ./docker/app
     volumes:
       - .:/var/www:rw
-      - ~/.config/composer/:/home/docker/.composer:rw
+      - ~/.config/composer/:/root/.composer:rw
     depends_on:
       - redis
       - db

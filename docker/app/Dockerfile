@@ -4,7 +4,7 @@ ENV PHP_EXTENSIONS="bcmath calendar exif gettext imagick intl mysqli opcache pcn
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
 RUN install-php-extensions ${PHP_EXTENSIONS}
-RUN apt-get install unzip && apt-get purge -y ${PHPIZE_DEPS} && apt-get autoremove -y --purge
+RUN apt-get update && apt-get install unzip && apt-get purge -y ${PHPIZE_DEPS} && apt-get autoremove -y --purge
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 COPY --from=nginx:stable /usr/sbin/nginx* /usr/sbin/
@@ -23,7 +23,7 @@ RUN set -eux; \
     mv /etc/php/php.ini-production /etc/php/php.ini; \
     rm -rf /var/www/html; \
     mkdir -p /var/log/nginx /var/cache/nginx; \
-    composer global remove hirak/prestissimo;
+    composer global require hirak/prestissimo;
 
 COPY files /
 
