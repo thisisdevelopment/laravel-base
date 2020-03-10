@@ -28,13 +28,13 @@ It uses `oomphinc/composer-installers-extender` to install packages of type lara
 This base install comes with a complete docker-compose setup out of the box. 
 It assumes you have a working local docker install which allows access to docker for your own user.
 
-To easily access the containers you should also run the `dvddarias/docker-hoster` container (see https://github.com/dvddarias/docker-hoster) to dynamically update your hosts file.
+To easily access the containers you should also run the `thisisdevelopment/docker-hoster` container (see https://github.com/thisisdevelopment/docker-hoster) to dynamically update your hosts file.
 
 ```
-docker run -d \
+docker run --restart=unless-stopped -d \
     -v /var/run/docker.sock:/tmp/docker.sock \
     -v /etc/hosts:/tmp/hosts \
-    dvdarias/docker-hoster
+    thisisdevelopment/docker-hoster
 ```
 
 ## Dev script
