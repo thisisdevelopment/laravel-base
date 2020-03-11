@@ -9,9 +9,12 @@ services:
     hostname: $APP_DOMAIN
     build:
       context: ./docker/app
+      args:
+          USER_ID: ${USER_ID:-1000}
+          GROUP_ID: ${GROUP_ID:-1000}
     volumes:
       - .:/var/www:rw
-      - ~/.config/composer/:/root/.composer:rw
+      - ~/.config/composer/:/home/www-data/.composer:rw
     depends_on:
       - redis
       - db
@@ -32,10 +35,10 @@ services:
     hostname: redis.$APP_DOMAIN
 
   mail:
-    image: mailhog/mailhog:latest
     hostname: mail.$APP_DOMAIN
-    sysctls:
-      net.ipv4.ip_unprivileged_port_start: 0
+    build:
+      context: ./docker/mail
     environment:
       MH_API_BIND_ADDR: 0.0.0.0:80
       MH_UI_BIND_ADDR: 0.0.0.0:80
+      MH_SMTP_BIND_ADDR: 0.0.0.0:25

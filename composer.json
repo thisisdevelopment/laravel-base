@@ -23,7 +23,7 @@
     "nunomaduro/collision": "^4.1",
     "phpunit/phpunit": "^8.5",
     "roave/security-advisories": "dev-master",
-    "thisisdevelopment/laravel-base-dev": "^0.1.1"
+    "thisisdevelopment/laravel-base-dev": "^0.1.3"
   },
   "config": {
     "optimize-autoloader": true,
@@ -72,6 +72,7 @@
     ],
     "post-root-package-install": [],
     "post-create-project-cmd": [
+      "Composer\\Config::disableProcessTimeout",
       "bin/gen-env",
       "bin/dev init",
       "php artisan key:generate"

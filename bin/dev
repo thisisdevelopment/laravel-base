@@ -3,51 +3,7 @@
 cd $(dirname "$0")/../
 if [ -f vendor/bin/dev ]; then
     exec vendor/bin/dev $@
+else
+    echo "laravel-base-dev is not installed, please run composer install / composer require --dev thisisdevelopment/laravel-base-dev"
+    exit 1
 fi
-
-COMPOSE="docker-compose -f docker/docker-compose.yml --project-directory ."
-
-function app_up () {
-    if [ -z $($COMPOSE ps -q app) ] || [ -z $(docker ps -q --no-trunc | grep $($COMPOSE ps -q app)) ]; then
-        echo -e "\033[31;App container not up!\033[0m, Please run:"
-        echo "./bin/dev up"
-        exit 1
-    fi
-}
-
-function deploy() {
-  $COMPOSE exec app ./bin/build
-  $COMPOSE exec app ./bin/post-deploy
-}
-
-case $1 in
-up)
-    $COMPOSE up --build -d
-    ;;
-
-init)
-    if [ -d .git ]; then
-        echo "This project is already initialized!"
-        exit 1
-    fi
-    find ./storage -type d -print0 | xargs -0 chmod 777
-    git init
-    cp ./bin/git-hooks/* ./.git/hooks/
-    chmod +x ./.git/hooks/*
-    $COMPOSE up --build -d
-    sleep 10s
-    deploy
-    ;;
-down)
-    app_up
-    $COMPOSE down
-    ;;
-
-rm)
-    $COMPOSE rm --stop --force
-    ;;
-*)
-    echo "Shortcuts to control development environment"
-    echo "Usage: $0 [up|init|down|rm]"
-    ;;
-esac

@@ -7,12 +7,17 @@ fi
 service=$(basename $(pwd))
 project=$(basename $(dirname $(pwd)))
 domain=${service}.${project}.docker
+uid=$(id -u)
+gid=$(id -g)
 
 cat > .env <<EOF
 COMPOSE_PROJECT_NAME=${project}_${service}
+USER_ID=${uid}
+GROUP_ID=${gid}
 
 APP_NAME="${project} -- ${service}"
 APP_DOMAIN=${domain}
+
 EOF
 
 cat .env.example >> .env

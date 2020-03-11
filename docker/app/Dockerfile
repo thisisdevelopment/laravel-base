@@ -1,5 +1,8 @@
 FROM php:7.4-fpm AS php-build
 
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+
 ENV PHP_EXTENSIONS="bcmath calendar exif gettext imagick intl mysqli opcache pcntl pdo_mysql redis soap sockets xdebug zip"
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
@@ -27,5 +30,16 @@ RUN set -eux; \
 
 COPY files /
 
+RUN if getent passwd www-data ; then userdel -f www-data; fi &&\
+    if getent group www-data ; then groupdel www-data; fi &&\
+    groupadd -g ${GROUP_ID} www-data &&\
+    useradd -l -u ${USER_ID} -g www-data www-data &&\
+    install -d -m 0755 -o www-data -g www-data /home/www-data &&\
+    chown --changes --silent --no-dereference --recursive \
+            --from=33:33 ${USER_ID}:${GROUP_ID} \
+            /home/www-data \
+            /var/www
+
 WORKDIR /var/www
-ENTRYPOINT ["/init"]
+
+ENTRYPOINT ["/entrypoint.sh"]
