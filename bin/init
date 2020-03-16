@@ -32,7 +32,6 @@ done
 echo "/.idea" >> .gitignore
 
 ./bin/dev init
-./bin/dev artisan key:generate
 
 if ! grep -qFx "#-----------Docker-Hoster-Domains----------" /etc/hosts; then
   echo "/*****************************"
