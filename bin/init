@@ -1,0 +1,59 @@
+#!/bin/bash
+
+if [ -f ".env" ]; then
+  exit 0;
+fi
+
+uuid_db=$(uuidgen)
+uuid_php=$(uuidgen)
+service=$(basename $(pwd))
+project=$(basename $(dirname $(pwd)))
+domain=${service}.${project}.docker
+uid=$(id -u)
+gid=$(id -g)
+
+cat > .env <<EOF
+COMPOSE_PROJECT_NAME=${project}_${service}
+USER_ID=${uid}
+GROUP_ID=${gid}
+
+APP_NAME="${project} -- ${service}"
+APP_DOMAIN=${domain}
+
+EOF
+
+cat .env.example >> .env
+
+export domain service project uuid_php uuid_db
+for i in .idea/*; do
+    envsubst "\$project \$service \$domain \$uuid_db \$uuid_php" < "$i" > "${i}.new"
+    mv "${i}.new" "$i"
+done
+echo "/.idea" >> .gitignore
+
+./bin/dev init
+./bin/dev artisan key:generate
+
+if ! grep -qFx "#-----------Docker-Hoster-Domains----------" /etc/hosts; then
+  echo "/*****************************"
+  echo "/* ------ WARNING -----------*"
+  echo "/*****************************"
+  echo "It seems you have no docker-hoster running, this means you have no easy way of connecting to your containers"
+  echo "You can start it with the following command: "
+  echo ""
+  echo "docker run --restart=unless-stopped -d \\"
+  echo "  -v /var/run/docker.sock:/tmp/docker.sock \\"
+  echo "  -v /etc/hosts:/tmp/hosts \\"
+  echo "  thisisdevelopment/docker-hoster"
+  echo ""
+  echo ""
+fi
+
+echo "/**********************************************************************"
+echo " * Your new laravel application is now configured an and available."
+echo " * The urls to reach the services on your local machine are:"
+echo " * - your application: http://${domain}"
+echo " * - mail catcher: http://mail.${domain}"
+echo " * - database server: mysql://db.${domain}:3306"
+echo " * - redis server: redis.${domain}"
+echo " **********************************************************************"

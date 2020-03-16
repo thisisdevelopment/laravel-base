@@ -73,9 +73,7 @@
     "post-root-package-install": [],
     "post-create-project-cmd": [
       "Composer\\Config::disableProcessTimeout",
-      "bin/gen-env",
-      "bin/dev init",
-      "php artisan key:generate"
+      "bin/init"
     ]
   }
 }

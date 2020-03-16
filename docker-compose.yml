@@ -5,8 +5,17 @@ networks:
     driver: bridge
 
 services:
-  app:
+  gateway:
     hostname: $APP_DOMAIN
+    build:
+      context: ./docker/gateway
+    volumes:
+      - .:/var/www:ro
+    depends_on:
+      - app
+
+  app:
+    hostname: app.$APP_DOMAIN
     build:
       context: ./docker/app
       args:
