@@ -5,22 +5,11 @@ networks:
     driver: bridge
 
 services:
-  gateway:
+  app:
     hostname: $APP_DOMAIN
     build:
-      context: ./docker/gateway
-    volumes:
-      - .:/var/www:ro
-    depends_on:
-      - app
-
-  app:
-    hostname: app.$APP_DOMAIN
-    build:
       context: ./docker/app
-      args:
-          USER_ID: ${USER_ID:-1000}
-          GROUP_ID: ${GROUP_ID:-1000}
+    user: ${USER_ID:-1000}:${GROUP_ID:-1000}
     volumes:
       - .:/var/www:rw
       - ~/.config/composer/:/home/www-data/.composer:rw
