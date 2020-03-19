@@ -1,43 +1,99 @@
-#!/bin/sh
+#!/bin/bash
 
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep ".php\{0,1\}$")
+# PHP CodeSniffer pre-commit hook for git
+#
+# Based on https://github.com/s0enke/git-hooks/tree/master/phpcs-pre-commit
 
-if [ "$STAGED_FILES" = "" ]; then
-  exit 0
+PHPCS_BIN=./vendor/bin/phpcs
+PHPCS_CODING_STANDARD=./phpcs.xml
+PHPCS_IGNORE_WARNINGS=0
+PHPCS_FILE_PATTERN="\.(php)$"
+
+TMP_STAGING=".tmp_staging"
+
+# simple check if code sniffer is set up correctly
+if [ ! -x $PHPCS_BIN ]; then
+    echo "PHP CodeSniffer bin not found or executable -> $PHPCS_BIN"
+    exit 1
 fi
 
-PASS=true
-
-echo "\nValidating PHPCS:\n"
-
-# Check for phpcs
-which ./vendor/bin/phpcs  &> /dev/null
-if [ "$?" = 1 ]; then
-  echo "\t\033[41mPlease install PHPCS\033[0m"
-  exit 1
+# stolen from template file
+if git rev-parse --verify HEAD 1>/dev/null 2>&1
+then
+    against=HEAD
+else
+    # Initial commit: diff against an empty tree object
+    against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
 fi
 
-RULESET=./phpcs.xml
+# this is the magic:
+# retrieve all files in staging area that are added, modified or renamed
+# but no deletions etc
+FILES=$(git diff-index --name-only --cached --diff-filter=ACMR $against -- )
 
-for FILE in $STAGED_FILES
+if [ "$FILES" == "" ]; then
+    exit 0
+fi
+
+# create temporary copy of staging area
+if [ -e $TMP_STAGING ]; then
+    rm -rf $TMP_STAGING
+fi
+mkdir $TMP_STAGING
+
+# match files against whitelist
+FILES_TO_CHECK=""
+for FILE in $FILES
 do
-  ./vendor/bin/phpcs --standard="$RULESET" "$FILE"
-
-  if [ "$?" = 0 ]; then
-    echo "\t\033[32mPHPCS Passed: $FILE\033[0m"
-  else
-    echo "\t\033[41mPHPCS Failed: $FILE\033[0m"
-    PASS=false
-  fi
+    echo "$FILE" | egrep -q "$PHPCS_FILE_PATTERN"
+    RETVAL=$?
+    if [ "$RETVAL" -eq "0" ]
+    then
+        FILES_TO_CHECK="$FILES_TO_CHECK $FILE"
+    fi
 done
 
-echo "\nPHPCS validation completed!\n"
-
-if ! $PASS; then
-  echo "\033[41mCOMMIT FAILED:\033[0m Your commit contains files that should pass PHPCS but do not. Please fix the PHPCS errors and try again.\n"
-  exit 1
-else
-  echo "\033[42mCOMMIT SUCCEEDED\033[0m\n"
+if [ "$FILES_TO_CHECK" == "" ]; then
+    exit 0
 fi
 
-exit $?
+if [ "$PHPCS_IGNORE_WARNINGS" == "1" ]; then
+    IGNORE_WARNINGS="-n"
+else
+    IGNORE_WARNINGS=""
+fi
+
+# Copy contents of staged version of files to temporary staging area
+# because we only want the staged version that will be commited and not
+# the version in the working directory
+for FILE in $FILES_TO_CHECK
+do
+  ID=$(git diff-index --cached $against $FILE | cut -d " " -f4)
+
+  # create staged version of file in temporary staging area with the same
+  # path as the original file so that the phpcs ignore filters can be applied
+  mkdir -p "$TMP_STAGING/$(dirname $FILE)"
+  git cat-file blob $ID > "$TMP_STAGING/$FILE"
+done
+
+if [ -f "$PHPCS_CODING_STANDARD" ]; then
+  cp "$(realpath $PHPCS_CODING_STANDARD)" $TMP_STAGING/
+fi
+
+PHPCS_BIN_REAL=$(realpath $PHPCS_BIN)
+
+pushd $TMP_STAGING > /dev/null
+OUTPUT=$($PHPCS_BIN_REAL --basepath=$(pwd) -s $IGNORE_WARNINGS)
+RETVAL=$?
+popd > /dev/null
+
+# delete temporary copy of staging area
+rm -rf $TMP_STAGING
+
+if [ $RETVAL -ne 0 ]; then
+    echo "$OUTPUT"
+    echo ""
+    echo -e "\033[41mCOMMIT FAILED => check PHPCS output above\033[0m\n"
+fi
+
+exit $RETVAL

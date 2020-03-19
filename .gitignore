@@ -21,3 +21,4 @@ Vagrantfile
 .env.*
 !.env.example
 common.env
+*~

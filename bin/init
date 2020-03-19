@@ -29,7 +29,6 @@ for i in .idea/*; do
     envsubst "\$project \$service \$domain \$uuid_db \$uuid_php" < "$i" > "${i}.new"
     mv "${i}.new" "$i"
 done
-echo "/.idea" >> .gitignore
 
 ./bin/dev init
 
