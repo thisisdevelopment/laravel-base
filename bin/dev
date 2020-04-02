@@ -1,6 +1,13 @@
-#!/bin/bash -e
+#!/bin/bash
+
+set -eu
 
 cd $(dirname "$0")/../
+
+if [ ! -d vendor/ ] || [ ! -f vendor/bin/dev ]; then
+    docker-compose run --no-deps app composer install
+fi
+
 if [ -f vendor/bin/dev ]; then
     exec vendor/bin/dev $@
 else

@@ -7,12 +7,13 @@ networks:
 services:
   app:
     hostname: $APP_DOMAIN
-    build:
-      context: ./docker/app
+    image: thisisdevelopment/php:7.4-fpm
     user: ${USER_ID:-1000}:${GROUP_ID:-1000}
     volumes:
       - .:/var/www:rw
-      - ~/.config/composer/:/home/www-data/.composer:rw
+      - ~/.composer:/home/www/.composer:rw
+      - ~/.cache:/home/www/.cache:rw
+      - ~/.npm:/home/www/.npm:rw
     depends_on:
       - redis
       - db
@@ -20,8 +21,7 @@ services:
 
   db:
     hostname: db.$APP_DOMAIN
-    build:
-      context: ./docker/database
+    image: mysql:8
     volumes:
       - ./docker/volumes/db:/var/lib/mysql
     environment:
@@ -34,8 +34,8 @@ services:
 
   mail:
     hostname: mail.$APP_DOMAIN
-    build:
-      context: ./docker/mail
+    image: mailhog/mailhog:latest
+    user: root
     environment:
       MH_API_BIND_ADDR: 0.0.0.0:80
       MH_UI_BIND_ADDR: 0.0.0.0:80

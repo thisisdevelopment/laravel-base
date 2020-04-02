@@ -8,6 +8,16 @@ An opinionated base laravel install.
 composer create-project thisisdevelopment/laravel-base <dir>
 ```
 
+Or alternatively if you don't have composer installed locally:
+
+```
+dir=<dir>
+git clone https://github.com/thisisdevelopment/laravel-base $dir
+cd $dir
+rm -rf .git
+./bin/dev init
+```
+
 ## Folder structure
 
 This is modeled after the domain oriented structure proposed by sticher.io:  https://stitcher.io/blog/laravel-beyond-crud-01-domain-oriented-laravel
@@ -20,6 +30,7 @@ The complete structure is
 - `app/Domain/<domain>` <= domain specific code
 - `app/Domain/vendor/<domain>` <= generic domain code (managed by composer, for packages with type=laravel-domain) 
 - `app/Module/<module>` <= module code (managed by composer, for packages with type=laravel-module) 
+- `packages/<package>/` <= composer wil automatically pickup any packages in this directory. This allows to develop packages alongside your application (see [packages/README.md](packages/README.md)) 
 
 It uses `oomphinc/composer-installers-extender` to install packages of type laravel-module/laravel-domain to the `app/Module` and `app/Domain/vendor` folders.  
 

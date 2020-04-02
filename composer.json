@@ -23,7 +23,7 @@
     "nunomaduro/collision": "^4.1",
     "phpunit/phpunit": "^8.5",
     "roave/security-advisories": "dev-master",
-    "thisisdevelopment/laravel-base-dev": "^0.3.0"
+    "thisisdevelopment/laravel-base-dev": "^0.4.0"
   },
   "config": {
     "optimize-autoloader": true,
@@ -73,7 +73,16 @@
     "post-root-package-install": [],
     "post-create-project-cmd": [
       "Composer\\Config::disableProcessTimeout",
-      "bin/init"
+      "bin/dev init"
     ]
+  },
+  "repositories": {
+    "package-dev": {
+      "type": "path",
+      "url": "./packages/*/",
+      "options": {
+        "symlink": true
+      }
+    }
   }
 }
