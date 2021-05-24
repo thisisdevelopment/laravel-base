@@ -17,6 +17,12 @@
             <directory suffix=".php">./app</directory>
         </whitelist>
     </filter>
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">./app/App</directory>
+            <directory suffix=".php">./app/Domain</directory>
+        </include>
+    </coverage>
     <php>
         <server name="APP_ENV" value="testing"/>
         <server name="BCRYPT_ROUNDS" value="4"/>
