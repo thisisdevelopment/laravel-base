@@ -2,31 +2,56 @@
   "name": "thisisdevelopment/laravel-base",
   "type": "project",
   "description": "Opinionated Laraval base install",
-  "keywords": ["framework", "laravel"],
+  "keywords": [
+    "framework",
+    "laravel"
+  ],
   "license": "MIT",
   "require": {
-    "php": "^7.4|^8.0",
-    "fideloper/proxy": "^4.4",
-    "fruitcake/laravel-cors": "^2.0",
-    "guzzlehttp/guzzle": "^7.0.1",
-    "laravel/framework": "^8.40",
-    "laravel/tinker": "^2.5",
+    "php": "^8.0.2",
+    "guzzlehttp/guzzle": "^7.2",
+    "laravel/framework": "^9.2",
+    "laravel/sanctum": "^2.14.1",
+    "laravel/tinker": "^2.7",
     "oomphinc/composer-installers-extender": "^2.0"
   },
   "require-dev": {
-    "facade/ignition": "^2.5",
     "fakerphp/faker": "^1.9.1",
     "laravel/sail": "^1.0.1",
-    "mockery/mockery": "^1.4.2",
-    "nunomaduro/collision": "^4.1",
-    "phpunit/phpunit": "^9.3.3",
+    "mockery/mockery": "^1.4.4",
+    "nunomaduro/collision": "^6.1",
+    "phpunit/phpunit": "^9.5.10",
+    "spatie/laravel-ignition": "^1.0",
     "roave/security-advisories": "dev-master",
-    "thisisdevelopment/laravel-base-dev": "^0.5.0"
+    "thisisdevelopment/laravel-base-dev": "^0.6.0"
   },
-  "config": {
-    "optimize-autoloader": true,
-    "preferred-install": "dist",
-    "sort-packages": true
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/App/",
+      "Domain\\": "app/Domain/",
+      "Support\\": "app/Support/",
+      "Database\\Factories\\": "database/factories/",
+      "Database\\Seeders\\": "database/seeders/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "post-autoload-dump": [
+      "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+      "@php artisan package:discover --ansi"
+    ],
+    "post-update-cmd": [
+      "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+    ],
+    "post-root-package-install": [],
+    "post-create-project-cmd": [
+      "Composer\\Config::disableProcessTimeout",
+      "bin/dev init"
+    ]
   },
   "extra": {
     "laravel": {
@@ -45,35 +70,13 @@
       ]
     }
   },
-  "autoload": {
-    "psr-4": {
-      "App\\": "app/App/",
-      "Domain\\": "app/Domain/",
-      "Support\\": "app/Support/"
-    },
-    "classmap": [
-      "database/seeds",
-      "database/factories"
-    ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Tests\\": "tests/"
-    }
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
   },
   "minimum-stability": "dev",
   "prefer-stable": true,
-  "scripts": {
-    "post-autoload-dump": [
-      "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-      "@php artisan package:discover --ansi"
-    ],
-    "post-root-package-install": [],
-    "post-create-project-cmd": [
-      "Composer\\Config::disableProcessTimeout",
-      "bin/dev init"
-    ]
-  },
   "repositories": {
     "package-dev": {
       "type": "path",
