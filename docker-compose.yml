@@ -21,7 +21,8 @@ services:
 
   db:
     hostname: db.$APP_DOMAIN
-    image: mysql:8
+    image: mysql:8-debian
+    user: ${USER_ID:-1000}:${GROUP_ID:-1000}
     volumes:
       - ./docker/volumes/db:/var/lib/mysql
     environment:
