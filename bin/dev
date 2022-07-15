@@ -5,7 +5,7 @@ set -eu
 cd $(dirname "$0")/../
 
 if [ ! -d vendor/ ] || [ ! -f vendor/bin/dev ]; then
-    docker-compose run --no-deps app composer install
+    docker-compose run -u $(id -u):$(id -g) --no-deps app composer install
 fi
 
 if [ -f vendor/bin/dev ]; then
