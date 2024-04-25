@@ -7,7 +7,7 @@ networks:
 services:
   app:
     hostname: $APP_DOMAIN
-    image: thisisdevelopment/php:8.2-fpm
+    image: thisisdevelopment/php:8.3-fpm
     user: ${USER_ID:-1000}:${GROUP_ID:-1000}
     volumes:
       - .:/var/www:rw
