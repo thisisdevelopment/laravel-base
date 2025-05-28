@@ -70,3 +70,47 @@ The supported commands are:
 ## Coding standards
 
 This base install enforces the `PSR-12` code standard. It does this by installing a git-hook which enforces this standard (by means of `phpcs`)
+
+## SSL/HTTPS
+### Linux
+To enable HTTPs on (Ubuntu) Linux, the following steps need to be performed.
+- generate local development certificate
+- rename app-hostname.
+- add nginx reverse proxy to docker-compose
+
+To generate a certificate you'll need the tool `mkcert` (to generate the certificate) and `libnss3-tools` to automatically register this certificate in your browser (Firefox/Chrome).  e.g. `apt-get install mkcert libnss3-tools`.
+
+When installed, we can generate the certificate by running the following commands from project root, where `app.services.docker` needs to be replaced with the value from your `.env`'s `APP_DOMAIN`.
+
+``` shell
+mkcert -key-file ./docker/services/app/certs/ssl.key -cert-file ./docker/services/app/certs/ssl.crt app.services.docker
+```
+
+Next, we need to add an additional service to the docker-stack, allowing us to use SSL.  If not present already, create a `docker-compose.override.yml` at project root, and add the following.
+``` yml
+services:
+  nginx:
+    image: nginx:latest
+    hostname: $APP_DOMAIN
+    depends_on:
+      - app
+    volumes:
+      - ./docker/services/app/certs/:/etc/nginx/ssl
+      - ./docker/services/app/nginx-ssl.conf:/etc/nginx/conf.d/app.services.docker.conf
+
+  app:
+    hostname: "" # this needs to be set to empty (or anything not APP_DOMAIN) to prevent collision with new nginx
+```
+
+Now you'll need to restart the entire stack with a `./bin/dev down && ./bin/dev up`.  At this point the app should be available through https on the original domain.
+
+### Mac
+Probably the easiest way to get https working is by using Orbstack using [these instructions](https://docs.orbstack.dev/features/https#https-for-containers).
+
+### Environment
+For both Linux and Mac you need to set `VITE_APP_ORIGIN` to a url that includes `https` in the `.env` file.:
+- `VITE_APP_ORIGIN=https://${APP_DOMAIN}`
+
+Everything _should_ work out of the box if you've followed the steps above, but you _might_ need to update these environment variables in your `.env` as well:
+- `APP_HTTPS=true`
+- `APP_DOMAIN=https://${APP_DOMAIN}`
